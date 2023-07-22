@@ -1,0 +1,11 @@
+---
+- name: Testing fetch
+  hosts: all:!controller
+  gather_facts: yes
+  become: yes
+  become_user: root
+  tasks:
+    - name: to fetch testfile
+      fetch:
+        src: /etc/testfile
+        dest: /

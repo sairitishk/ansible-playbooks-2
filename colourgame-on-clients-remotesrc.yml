@@ -1,0 +1,65 @@
+---
+- name: Play topy them into index file loc of nginx
+  hosts: all:!controller
+  gather_facts: yes
+  become: yes
+  become_user: root
+  serial: 1
+  tasks:
+  - name: perform apt update
+    shell: apt update
+  
+  - name: clone git repo
+    shell: |
+      cd /tmp
+      git clone https://github.com/mavrick202/dockertest1.git
+    
+    # - name: copy html, css and js files
+    #   ansible.builtin.copy:
+    #     src: /tmp/dockertest1/{{ item }}
+    #     dest: /var/www/html/{{ item }}
+    #     remote_src: yes
+    #     owner: root
+    #     group: root
+    #     mode: '0644'
+    #   with_items:
+    #     - index.html
+    #     - scorekeeper.js
+    #     - style.css
+  - name: Copy the files to index destination folder.
+    copy: >
+      src=/tmp/dockertest1/index.html
+      dest=/var/www/html/index.nginx-debian.html
+      remote_src=yes
+      owner=root
+      group=root
+      mode=0644
+    ignore_errors: yes #Will Proceed to next task even it failed.
+    tags:
+     - index
+
+  - name: Copy the style files to  destination folder.
+    copy: >
+      src=/tmp/dockertest1/style.css
+      dest=/var/www/html/style.css
+      remote_src=yes
+      owner=root
+      group=root
+      mode=0644
+    tags:
+      - style
+
+  - name: Copy the javascript files to  destination folder.
+    copy: >
+      src=/tmp/dockertest1/scorekeeper.js
+      dest=/var/www/html/scorekeeper.js
+      remote_src=yes
+      owner=root
+      group=root
+      mode=0644
+    tags:
+       - js
+  - name: restart nginx server
+    command: service nginx restart
+
+    

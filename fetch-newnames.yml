@@ -1,0 +1,25 @@
+---
+- name: testing fetch with othernames in controller
+  hosts: all:!controller
+  gather_facts: yes
+  become: yes
+  become_user: root
+  serial: 1
+  vars:
+  - hostname: "{{ansible_facts['hostname']}}"
+  tasks:
+  - name: generate a random number
+    shell: date +%s
+    register: randnumber
+  - debug:
+      var: randnumber.stdout
+  - name: copy files with name as randnumber
+    fetch:
+      src: /etc/testfile
+      dest: /tmp/testfile{{randnumber.stdout}}
+      flat: yes
+  - name: copy files with hostname
+    fetch:
+      src: /etc/testfile
+      dest: /tmp/{{hostname}}
+      flat: yes
